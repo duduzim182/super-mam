@@ -27,11 +27,37 @@ this.load.image('enemy','vilao.png');
 this.load.image('laser','laser.png');
 }
 function create (){
-player = this.physics.add.sprite(400,300,'player');
+player = this.physics.add.sprite(100,500,'player');
 player.setScale(0.1)
-enemy = this.physics.add.sprite(200,500,'enemy');
+enemy = this.physics.add.sprite(700,100,'enemy');
 enemy.setScale(0.4)
+laser=this.physics.add.group({
+    defaultKey:'laser',
+    maxSize:5,
+    runChildUpdate:true
+})
+cursors = this.input.keyboard.createCursorKeys();
 }
 function update (){
-    
+    if (cursors.left.isDown){
+        player.x-=3;
+    }
+    else if (cursors.right.isDown){
+        player.x+=3;
+    }
+    if (cursors.up.isDown){
+        player.y-=3;
+    }
+    else if  (cursors.down.isDown){
+        player.y+=3;
+    }
+    if (Phaser.Input.keyboard.JustDown(cursors.space)){
+    playerProjetil()
+    }
+}
+function playerProjetil(){
+    const projetil=laser.get(player.x, player.y-20);
+    if (projetil){
+        projetil.setActive(true).setVisible(true)
+    }
 }
