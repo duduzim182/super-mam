@@ -1,3 +1,10 @@
+let player;
+let cursors;
+let enemy;
+let laser;
+let kripto;
+lestEnemyShot = 0;
+
 const config = {
     type: Phaser.AUTO,
     width: 800,
@@ -16,15 +23,12 @@ const config = {
     }
 }
 const game = new Phaser.Game(config);
-let player;
-let cursors;
-let enemy;
-let laser;
 
 function preload (){
 this.load.image('player','supermam.png');
 this.load.image('enemy','vilao.png');
 this.load.image('laser','laser.png');
+this.load.image('kriptonita', 'kriptonita.png')
 }
 function create (){
 player = this.physics.add.sprite(100,500,'player');
@@ -39,9 +43,19 @@ laser=this.physics.add.group({
     maxSize:10,
     runChildUpdate:true
 })
+kripto = this.physics.add.group({
+    defaultKey: 'kriptonita',
+    maxSize: 5
+})
+this.physics.add.overlap(laser, enemy, hitEnemy, null, this);
+this.physics.add.overlap(kripto, player, hitPlayer, null, this);
+this.physics.add.overlap(enemy, laser, hitEnemy, null, this);
+
 cursors = this.input.keyboard.createCursorKeys();
+//inicia disparos do inimigo a cada 1.5s
+    enemyShootTime = setInterval(kripto, 1500);
 }
-function update (){
+function update (time){
     if (cursors.left.isDown){
         player.x-=3;
     }
@@ -63,6 +77,22 @@ function update (){
     else if (enemy.y>=500){
         enemy.setVelocityY(-100)
     }
+
+    // inimigo lança projeteis automaticamente a cada 1.5 segundos
+    if(time > lestEnemyShot + 1500){
+        kripto.call(this);
+        kripto = time;
+    }
+       
+   //limpeza dos projeteis fora da tela
+   laser.children.each(projetil => {
+    if (projetil.active && projetil.x > 800).projeteis.setActive(false).setInterval.setVisible(false);
+   })
+
+   kripto.children.each(projetil => {
+    if (projetil.active && projetil.x > 0).projeteis.setActive(false).setInterval.setVisible(false);
+   })
+
 }
 function playerProjetil(){
     const projetil=laser.get(player.x, player.y-20);
