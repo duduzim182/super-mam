@@ -3,7 +3,15 @@ let cursors;
 let enemy;
 let laser;
 let kripto;
-lestEnemyShot = 0;
+let lestEnemyShot = 0;
+let score = 0;
+let lives = 3;
+let scoreText;
+let livesText;
+let enemyLifeText;
+let victoryText;
+let enemyLife = 5;
+
 
 const config = {
     type: Phaser.AUTO,
@@ -30,30 +38,42 @@ this.load.image('enemy','vilao.png');
 this.load.image('laser','laser.png');
 this.load.image('kriptonita', 'kriptonita.png')
 }
-function create (){
-player = this.physics.add.sprite(100,500,'player');
-player.setScale(0.1)
-player.setCollideWorldBounds(true)
-enemy = this.physics.add.sprite(700,100,'enemy');
-enemy.setScale(0.4)
-enemy.setCollideWorldBounds(true)
-enemy.setVelocityY(-100)
-laser=this.physics.add.group({
-    defaultKey:'laser',
-    maxSize:10,
-    runChildUpdate:true
-})
-kripto = this.physics.add.group({
-    defaultKey: 'kriptonita',
-    maxSize: 5
-})
-this.physics.add.overlap(laser, enemy, hitEnemy, null, this);
-this.physics.add.overlap(kripto, player, hitPlayer, null, this);
-this.physics.add.overlap(enemy, laser, hitEnemy, null, this);
 
-cursors = this.input.keyboard.createCursorKeys();
-//inicia disparos do inimigo a cada 1.5s
-    enemyShootTime = setInterval(kripto, 1500);
+function create (){
+    player = this.physics.add.sprite(100,500,'player');
+    player.setScale(0.1)
+    player.setCollideWorldBounds(true)
+
+    enemy = this.physics.add.sprite(700,100,'enemy');
+    enemy.setScale(0.4)
+    enemy.setCollideWorldBounds(true)
+    enemy.setVelocityY(-100)
+
+    laser=this.physics.add.group({
+        defaultKey:'laser',
+        maxSize:10,
+        runChildUpdate:true
+    })
+
+    kripto = this.physics.add.group({
+        defaultKey: 'kriptonita',
+        maxSize: 5
+    })
+
+    this.physics.add.overlap(laser, enemy, hitEnemy, null, this);
+    this.physics.add.overlap(kripto, player, hitPlayer, null, this);
+    this.physics.add.overlap(enemy, laser, hitEnemy, null, this);
+
+    cursors = this.input.keyboard.createCursorKeys();
+
+    scoreText = this.add.text(16,16,'pontuaçao: 0',{fontSize:'20px', fill : '#fff'})
+    livesText = this.add.text(16,40,'vidas: 3',{fontSize:'20px', fill : '#fff'})
+    enemyLifeText=this.add.text(600,16,`vida do inimigo: ${enemyLife}`,{fontSize:'20px', fill : 'rgba(126, 0, 0, 1)'})
+    victoryText = this.add.text(400,300,'vitoria',{fontSize:'40px', fill : '#ced500ff'}).setOrigin(0.5).setVisible(false);
+
+
+    //inicia disparos do inimigo a cada 1.5s
+    enemyShotTime = setInterval(projetilEnemy, 1500);
 }
 function update (time){
     if (cursors.left.isDown){
@@ -80,17 +100,17 @@ function update (time){
 
     // inimigo lança projeteis automaticamente a cada 1.5 segundos
     if(time > lestEnemyShot + 1500){
-        kripto.call(this);
-        kripto = time;
+        projetilEnemy.call(this);
+        lestEnemyShot = time;
     }
        
    //limpeza dos projeteis fora da tela
    laser.children.each(projetil => {
-    if (projetil.active && projetil.x > 800).projeteis.setActive(false).setInterval.setVisible(false);
+    if (projetil.active && projetil.x > 800) projeteis.setActive(false).setInterval.setVisible(false);
    })
 
    kripto.children.each(projetil => {
-    if (projetil.active && projetil.x > 0).projeteis.setActive(false).setInterval.setVisible(false);
+    if (projetil.active && projetil.x > 0) projeteis.setActive(false).setInterval.setVisible(false);
    })
 
 }
@@ -102,4 +122,21 @@ function playerProjetil(){
         projetil.body.allowGravity=false;
         projetil.setVelocityX(1500)
     }
+}
+function projetilEnemy (){
+   const projetil=kripto.get(enemy.x, enemy.y+20); 
+       if (projetil){
+        projetil.setActive(true).setVisible(true).setScale(0.2);
+        projetil.body.enable=true;
+        projetil.body.allowGravity=false;
+        const angle = Phaser.Math.Angle.Between(projetil.x , projetil.y, player.x, player.y)
+        const speed = 200
+        projetil.setVelocity(Math.cos(angle)*speed, Math.sin(angle)*speed)
+    }
+}
+function hitEnemy (projetil, enemy){
+    projetil.disableBody(true,true);
+    score += 10
+    scoreText.setText('pontuaçao: '+score);
+
 }
