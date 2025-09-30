@@ -106,11 +106,11 @@ function update (time){
        
    //limpeza dos projeteis fora da tela
    laser.children.each(projetil => {
-    if (projetil.active && projetil.x > 800) projeteis.setActive(false).setInterval.setVisible(false);
+    if (projetil.active && projetil.x > 800) projetil.setActive(false).setVisible(false);
    })
 
    kripto.children.each(projetil => {
-    if (projetil.active && projetil.x > 0) projeteis.setActive(false).setInterval.setVisible(false);
+    if (projetil.active && projetil.x > 0) projetil.setActive(false).setVisible(false);
    })
 
 }
@@ -139,4 +139,27 @@ function hitEnemy (projetil, enemy){
     score += 10
     scoreText.setText('pontuaçao: '+score);
 
+    enemyLife--;
+    enemyLifeText.setText(`vida do inimigo; ${enemyLife}`);// atualiza o placar da vida
+
+    if (enemyLife <= 0){
+        enemy.disableBody(true, true)// inimigo desaparecer
+        victoryText.setVisible(true)// exibir vitoria
+        clearInterval(enemyShotTime)//parar os disparos do inimigo
+        kripto.clear(true,true)//limpar o inventario do inimigo
+    }
+}
+
+//colisao: inimigo acerta o player
+function hitPlayer(player, laser){
+    laser.disableBody(true, true);
+
+    lives--;
+    livesText.setText(`vidas: ${lives}`)
+
+    if (lives <=0){
+        this.physics.pause();
+        player.setTint(0xff0000)// vida do jogador fica vermelha ao morrer
+        livesText.setText('vidas: 0 (Game Over');
+    }
 }
